@@ -1,76 +1,103 @@
 public class QuantityMeasurementApp {
 
-    // ---------------- UNIT ENUM ----------------
+    // ---------------- LENGTH UNIT ENUM ----------------
     public enum LengthUnit {
 
         FEET(1.0),
         INCH(1.0 / 12.0),
         YARD(3.0),
-        CENTIMETER(0.01 / 0.3048); // 1 cm in feet
+        CENTIMETER(0.01 / 0.3048); // cm → feet
 
-        private final double conversionFactorToFeet;
+        private final double factorToFeet;
 
-        LengthUnit(double conversionFactorToFeet) {
-            this.conversionFactorToFeet = conversionFactorToFeet;
+        LengthUnit(double factorToFeet) {
+            this.factorToFeet = factorToFeet;
         }
 
-        public double getConversionFactorToFeet() {
-            return conversionFactorToFeet;
+        public double getFactorToFeet() {
+            return factorToFeet;
         }
     }
 
-    // ---------------- GENERIC QUANTITY CLASS ----------------
+    // ---------------- GENERIC VALUE OBJECT ----------------
     public static class QuantityLength {
 
         private final double value;
         private final LengthUnit unit;
 
         public QuantityLength(double value, LengthUnit unit) {
+            if (!Double.isFinite(value)) {
+                throw new IllegalArgumentException("Invalid numeric value");
+            }
+            if (unit == null) {
+                throw new IllegalArgumentException("Unit cannot be null");
+            }
+
             this.value = value;
             this.unit = unit;
         }
 
+        // Normalize to base unit (FEET)
         private double toFeet() {
-            return this.value * unit.getConversionFactorToFeet();
+            return value * unit.getFactorToFeet();
         }
 
+        // ---------------- UC3/UC4 EQUALITY ----------------
         @Override
         public boolean equals(Object obj) {
 
             if (this == obj) return true;
-            if (obj == null) return false;
-            if (this.getClass() != obj.getClass()) return false;
+            if (obj == null || getClass() != obj.getClass()) return false;
 
             QuantityLength other = (QuantityLength) obj;
-
             return Double.compare(this.toFeet(), other.toFeet()) == 0;
+        }
+
+        @Override
+        public String toString() {
+            return value + " " + unit;
         }
     }
 
-    // ---------------- GENERIC COMPARISON METHOD ----------------
-    public static boolean compare(double value1, LengthUnit unit1,
-                                  double value2, LengthUnit unit2) {
+    // ---------------- UC5 CORE API (CONVERSION) ----------------
+    public static double convert(double value,
+                                 LengthUnit source,
+                                 LengthUnit target) {
 
-        QuantityLength q1 = new QuantityLength(value1, unit1);
-        QuantityLength q2 = new QuantityLength(value2, unit2);
+        if (!Double.isFinite(value)) {
+            throw new IllegalArgumentException("Invalid numeric value");
+        }
+        if (source == null || target == null) {
+            throw new IllegalArgumentException("Unit cannot be null");
+        }
 
-        return q1.equals(q2);
+        // Convert source → feet
+        double valueInFeet = value * source.getFactorToFeet();
+
+        // Convert feet → target
+        return valueInFeet / target.getFactorToFeet();
     }
 
-    // ---------------- MAIN METHOD ----------------
+    // ---------------- OVERLOADED API (OPTIONAL UX LAYER) ----------------
+    public static double convert(QuantityLength quantity,
+                                 LengthUnit targetUnit) {
+
+        return convert(quantity.value, quantity.unit, targetUnit);
+    }
+
+    // ---------------- DEMO ----------------
     public static void main(String[] args) {
 
-        System.out.println("1 Yard vs 3 Feet: " +
-                compare(1.0, LengthUnit.YARD, 3.0, LengthUnit.FEET)); // true
+        System.out.println("1 feet → inches: " +
+                convert(1.0, LengthUnit.FEET, LengthUnit.INCH)); // 12
 
-        System.out.println("1 Yard vs 36 Inches: " +
-                compare(1.0, LengthUnit.YARD, 36.0, LengthUnit.INCH)); // true
+        System.out.println("3 yards → feet: " +
+                convert(3.0, LengthUnit.YARD, LengthUnit.FEET)); // 9
 
-        System.out.println("2 Yards vs 2 Yards: " +
-                compare(2.0, LengthUnit.YARD, 2.0, LengthUnit.YARD)); // true
+        System.out.println("36 inches → yards: " +
+                convert(36.0, LengthUnit.INCH, LengthUnit.YARD)); // 1
 
-        System.out.println("1 cm vs 0.393701 inch: " +
-                compare(1.0, LengthUnit.CENTIMETER, 0.393701, LengthUnit.INCH)); // true
+        System.out.println("1 cm → inch: " +
+                convert(1.0, LengthUnit.CENTIMETER, LengthUnit.INCH)); // ~0.3937
     }
-}
 }
