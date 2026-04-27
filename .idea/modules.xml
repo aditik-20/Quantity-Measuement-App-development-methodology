@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/QMADM/QMADM.iml" filepath="$PROJECT_DIR$/QMADM/QMADM.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/Quantity-Measuement-App-development-methodology.iml" filepath="$PROJECT_DIR$/.idea/Quantity-Measuement-App-development-methodology.iml" />
+    </modules>
+  </component>
+</project>
