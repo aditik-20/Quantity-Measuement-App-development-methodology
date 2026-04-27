@@ -4,7 +4,9 @@ public class QuantityMeasurementApp {
     public enum LengthUnit {
 
         FEET(1.0),
-        INCH(1.0 / 12.0);
+        INCH(1.0 / 12.0),
+        YARD(3.0),
+        CENTIMETER(0.01 / 0.3048); // 1 cm in feet
 
         private final double conversionFactorToFeet;
 
@@ -45,7 +47,7 @@ public class QuantityMeasurementApp {
         }
     }
 
-    // ---------------- STATIC METHODS (optional abstraction layer) ----------------
+    // ---------------- GENERIC COMPARISON METHOD ----------------
     public static boolean compare(double value1, LengthUnit unit1,
                                   double value2, LengthUnit unit2) {
 
@@ -58,13 +60,17 @@ public class QuantityMeasurementApp {
     // ---------------- MAIN METHOD ----------------
     public static void main(String[] args) {
 
-        System.out.println("1 feet vs 12 inch: " +
-                compare(1.0, LengthUnit.FEET, 12.0, LengthUnit.INCH)); // true
+        System.out.println("1 Yard vs 3 Feet: " +
+                compare(1.0, LengthUnit.YARD, 3.0, LengthUnit.FEET)); // true
 
-        System.out.println("1 inch vs 1 inch: " +
-                compare(1.0, LengthUnit.INCH, 1.0, LengthUnit.INCH)); // true
+        System.out.println("1 Yard vs 36 Inches: " +
+                compare(1.0, LengthUnit.YARD, 36.0, LengthUnit.INCH)); // true
 
-        System.out.println("1 feet vs 2 feet: " +
-                compare(1.0, LengthUnit.FEET, 2.0, LengthUnit.FEET)); // false
+        System.out.println("2 Yards vs 2 Yards: " +
+                compare(2.0, LengthUnit.YARD, 2.0, LengthUnit.YARD)); // true
+
+        System.out.println("1 cm vs 0.393701 inch: " +
+                compare(1.0, LengthUnit.CENTIMETER, 0.393701, LengthUnit.INCH)); // true
     }
+}
 }
